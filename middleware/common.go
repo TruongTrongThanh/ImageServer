@@ -1,4 +1,4 @@
-package middlewares
+package middleware
 
 import (
 	"log"
@@ -6,9 +6,6 @@ import (
 
 	"github.com/TruongTrongThanh/ImageServer/helper"
 )
-
-// MidHandlerFunc ...
-type MidHandlerFunc func(next http.Handler) http.Handler
 
 // Common ...
 func Common(next http.Handler) http.Handler {

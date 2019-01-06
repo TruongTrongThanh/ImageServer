@@ -1,15 +1,17 @@
-package middlewares
+package middleware
 
 import (
 	"net/http"
 )
+
+// MidHandlerFunc ...
+type MidHandlerFunc func(next http.Handler) http.Handler
 
 // SetMiddlewares ...
 func SetMiddlewares(handler http.Handler) http.Handler {
 	return middlewareChains(handler,
 		Common,
 		Auth,
-		Filter,
 	)
 }
 

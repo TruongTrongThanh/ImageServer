@@ -5,12 +5,21 @@ import (
 	"mime/multipart"
 	"os"
 	"path"
+	"strconv"
+
+	"github.com/TruongTrongThanh/ImageServer/helper"
 )
 
-// StoreMultipartFile ...
-func StoreMultipartFile(f multipart.File, fHeader *multipart.FileHeader) error {
+// StoreImageFile ...
+func StoreImageFile(f multipart.File, fHeader *multipart.FileHeader, name string) error {
 	dir := os.Getenv("StoredPath")
-	pathname := path.Join(dir, fHeader.Filename)
+	num, _ := strconv.Atoi(name)
+	subDir := helper.SimpleHash(num)
+	dirErr := os.Mkdir(dir+"/"+subDir, os.ModeDir)
+	if dirErr != nil {
+		return dirErr
+	}
+	pathname := path.Join(dir, subDir, name+path.Ext(fHeader.Filename))
 	file, createErr := os.Create(pathname)
 	if createErr != nil {
 		return createErr
@@ -22,4 +31,20 @@ func StoreMultipartFile(f multipart.File, fHeader *multipart.FileHeader) error {
 		return copyErr
 	}
 	return nil
+}
+
+// DeleteImageFile ...
+func DeleteImageFile(img *Image) (error, error) {
+	dir := os.Getenv("StoredPath")
+	var path, thumbPath string
+	var err, thumbErr error
+
+	path = img.GetLocalPath(false)
+	err = os.Remove(dir + "/" + path)
+
+	if img.ThumbURL != "" {
+		thumbPath = img.GetLocalPath(true)
+		thumbErr = os.Remove(dir + "/" + thumbPath)
+	}
+	return err, thumbErr
 }

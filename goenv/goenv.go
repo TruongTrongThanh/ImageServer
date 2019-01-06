@@ -2,6 +2,7 @@ package goenv
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 )
@@ -12,9 +13,9 @@ func LoadEnv() {
 	if readErr != nil {
 		panic(readErr)
 	}
-	env := make(map[string]string)
+	env := make(map[string]interface{})
 	json.Unmarshal(bytes, &env)
 	for key, value := range env {
-		os.Setenv(key, value)
+		os.Setenv(key, fmt.Sprint(value))
 	}
 }

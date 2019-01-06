@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	midd "github.com/TruongTrongThanh/ImageServer/middleware"
 )
@@ -24,6 +25,10 @@ func NewRouter(root string) *Router {
 
 // RegisterRoute ...
 func (rtr *Router) RegisterRoute(mappingPath string, method string, handler http.HandlerFunc) {
+	if mappingPath == os.Getenv("FileServerPath") {
+		log.Printf("Can't map with same file server path: %s\n", mappingPath)
+		return
+	}
 	if frt, hasMethod := rtr.IsDuplicateRoute(mappingPath, method); frt != nil {
 		if hasMethod {
 			log.Printf("IGNORE duplicate route: %s - %s\n", mappingPath, method)

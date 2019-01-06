@@ -1,14 +1,18 @@
-package middlewares
+package middleware
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/TruongTrongThanh/ImageServer/helper"
 )
 
 // Filter ...
-func Filter(next http.Handler) http.Handler {
+func Filter(next http.Handler, paths ...string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Filter handle...")
-		next.ServeHTTP(w, r)
+		if helper.StringSliceContains(paths, r.URL.Path) {
+			http.NotFound(w, r)
+		} else {
+			next.ServeHTTP(w, r)
+		}
 	})
 }

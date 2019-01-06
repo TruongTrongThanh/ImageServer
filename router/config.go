@@ -15,6 +15,7 @@ func Init(root string) *Router {
 	// Image routes
 	rtr.RegisterRoute("/image", "GET", routes.GetImages)
 	rtr.RegisterRoute("/image", "POST", routes.UploadImages)
+	rtr.RegisterRoute("/image", "DELETE", routes.DeleteImage)
 
 	return rtr
 }

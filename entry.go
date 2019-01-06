@@ -4,26 +4,46 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strconv"
 
 	"github.com/TruongTrongThanh/ImageServer/goenv"
+	midd "github.com/TruongTrongThanh/ImageServer/middleware"
 	"github.com/TruongTrongThanh/ImageServer/repository"
 	"github.com/TruongTrongThanh/ImageServer/router"
 )
 
 func main() {
-	// Setup environment variables
+	// Environment variables setup
 	goenv.LoadEnv()
 
-	// Setup Database
+	// Database setup
 	repository.Connect()
 	repository.CreateImageTable()
 
-	// Setup router
+	// Router setup
 	mux := http.NewServeMux()
 	rtr := router.Init("")
 	rtr.MappingTo(mux)
 
+	// File Server setup
+	fsPath := os.Getenv("FileServerPath")
+	fmt.Printf("File Server serve at: %s\n", fsPath)
+	dir := http.Dir(filepath.ToSlash(os.Getenv("StoredPath")))
+	fsHandler := http.StripPrefix(fsPath, http.FileServer(dir))
+	mux.Handle(fsPath, midd.Filter(fsHandler, fsPath))
+
 	// Serve
-	fmt.Println("Serve at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", mux))
+	isSSL, err := strconv.ParseBool(os.Getenv("ssl"))
+	if err != nil {
+		panic(err)
+	}
+	hostname, port := os.Getenv("hostname"), os.Getenv("port")
+	if isSSL {
+		panic("Not supported SSL right now")
+	} else {
+		fmt.Printf("Serve at http://%s:%s\n", hostname, port)
+		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%s", hostname, port), mux))
+	}
 }
