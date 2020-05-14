@@ -1,1 +1,2 @@
 ﻿Sửa lại rồi git push lần 2
+sua lai bang vim
